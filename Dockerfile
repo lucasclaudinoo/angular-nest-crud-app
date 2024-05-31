@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 4200
 
 # Comando para iniciar a aplicação
-CMD ["ng", "serve", "--host", "0.0.0.0"]
+CMD ["ng", "serve", "--host", "0.0.0.0", "--poll", "--disable-host-check"]

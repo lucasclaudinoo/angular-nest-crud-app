@@ -1,6 +1,6 @@
 // app.routes.ts
 import { Routes } from '@angular/router';
-import { authGuard } from './core/auth.guard';	
+import { authGuard } from './shared/auth.guard';	
 import { LoginComponent } from './login/login.component';
 import { AppComponent } from './app.component';
 
