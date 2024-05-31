@@ -1,16 +1,15 @@
-// app.routes.ts
 import { Routes } from '@angular/router';
 import { authGuard } from './shared/auth.guard';	
 import { LoginComponent } from './login/login.component';
 import { AppComponent } from './app.component';
+import { HomeComponent } from './home/home.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: AppComponent,
+    component: HomeComponent,
     canActivate: [authGuard],
     children: [
-      // Outras rotas protegidas podem ser adicionadas aqui
     ]
   },
   {
