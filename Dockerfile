@@ -1,6 +1,5 @@
-meu hot reload não funciona no docker por que ?
-
 FROM node:20.14.0
+
 WORKDIR /usr/src/app
 
 COPY package*.json ./

@@ -1,0 +1,46 @@
+body, html {
+    height: 100%;
+    margin: 0;
+  }
+  
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Use 100vh para garantir que o contêiner ocupe toda a altura da viewport */
+  }
+  
+  .login-card {
+    width: 100%;
+    max-width: 30%; 
+    padding: 16px;
+  }
+  
+  .login-form-field {
+    width: 100%;
+    margin-top: 10%;
+  }
+  
+  .login-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 25%;
+  }
+  
+  mat-card-title {
+    font-size: 24px;
+    text-align: left;
+    color: #333; /* Cor do texto do título */
+    margin-bottom: 16px;
+  }
+  
+  mat-card {
+    border-radius: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Adicionado sombra ao card */
+    width: 80%; /* Ajuste este valor conforme necessário */
+    margin: auto; /* Centraliza o card se ele não ocupar toda a largura */
+  }
+
+  .full-width {
+    width: 97%;
+  }
