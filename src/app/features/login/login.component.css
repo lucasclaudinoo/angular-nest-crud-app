@@ -45,4 +45,18 @@ body, html {
     width: 97%;
   }
 
+  .general-error-container {
+    height: 24px; /* Defina uma altura que acomode a mensagem de erro */
+    display: flex;
+    align-items: center; /* Centraliza verticalmente */
+  }
+  
+  .general-error {
+    color: red;
+  }
+
+  mat-spinner {
+    margin-right: 8px;
+  }
+  
   

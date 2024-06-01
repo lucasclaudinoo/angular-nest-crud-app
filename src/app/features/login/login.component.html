@@ -3,11 +3,17 @@
     <mat-card-content>
       <mat-grid-list cols="1" rowHeight="200px">
         <mat-card-title>Login</mat-card-title>
+        <!-- Contêiner com altura fixa para a mensagem de erro geral -->
+        <div class="general-error-container">
+          <div class="general-error" *ngIf="invalidCrendentialsText">
+            Credenciais inválidas. Por favor, tente novamente.
+          </div>
+        </div>
         <mat-form-field class="login-form-field">
           <mat-label>Email</mat-label>
           <input matInput type="email" placeholder="Ex. pat@example.com" formControlName="email">
           <mat-error *ngIf="(submitted && loginForm.get('email')?.invalid) || emailErrorMessage">
-              {{ emailErrorMessage }}
+            {{ emailErrorMessage }}
           </mat-error>
         </mat-form-field>
         <mat-form-field class="login-form-field">
@@ -23,7 +29,10 @@
       </mat-grid-list>
     </mat-card-content>
     <mat-card-actions class="login-actions">
-      <button mat-raised-button color="primary" class="full-width" (click)="login()">Login</button>
+      <button mat-raised-button color="primary" class="full-width" (click)="login()" [disabled]="isLoading">
+        <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+        <span *ngIf="!isLoading">Login</span>
+      </button>
     </mat-card-actions>
   </mat-card>
 </div>
