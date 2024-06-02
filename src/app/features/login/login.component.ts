@@ -125,6 +125,7 @@ export class LoginComponent implements OnInit {
     this.validateForm();
 
     if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
       return;
     }
 
@@ -133,17 +134,16 @@ export class LoginComponent implements OnInit {
       email: this.email?.value,
       password: this.password?.value
     }).subscribe(
-      (response: { accessToken: string; refreshToken: string; error?: string }) => {
+      () => {
         this.isLoading = false;
-        if (response.accessToken) {
-          this.router.navigate(['/home']);
-        }
+        this.router.navigate(['/home']);
       },
-      (error: any) => {
-        this.invalidCredentialsText = true;
-        this.validateForm();
+      () => {
         this.isLoading = false;
+        this.validateForm();
+        this.invalidCredentialsText = true;
       }
     );
+  
   }
 }

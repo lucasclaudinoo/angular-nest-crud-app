@@ -9,7 +9,7 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const accessToken = this.authService.getAccessToken();
+    const accessToken = this.authService.getAccessTokenValue();
 
     let authReq = req;
     if (accessToken) {
@@ -26,26 +26,25 @@ export class AuthInterceptor implements HttpInterceptor {
           return this.handle401Error(req, next);
         }
         return throwError(error);
-      }
-    ));
-    }
-    
-    private handle401Error(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-      return this.authService.refreshAccessToken().pipe(
-        switchMap(() => {
-          const accessToken = this.authService.getAccessToken();
-          const authReq = req.clone({
-            setHeaders: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-          return next.handle(authReq);
-        }),
-        catchError((error) => {
-          this.authService.logout();
-          return throwError(error);
-        })
-      );
-    }
+      })
+    );
+  }
+
+  private handle401Error(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    return this.authService.refreshAccessToken().pipe(
+      switchMap(() => {
+        const accessToken = this.authService.getAccessTokenValue();
+        const authReq = req.clone({
+          setHeaders: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        return next.handle(authReq);
+      }),
+      catchError((error: any) => {
+        this.authService.logout();
+        return throwError(error);
+      })
+    );
+  }
 }
-    

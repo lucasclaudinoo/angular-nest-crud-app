@@ -9,57 +9,45 @@ import { tap } from 'rxjs/operators';
 export class AuthService {
   private apiUrl = 'http://localhost:3000';
   private authenticated = new BehaviorSubject<boolean>(false);
-  private accessToken: string | null = null;
-  private _refreshToken: string | null = null;
+  private accessToken = new BehaviorSubject<string | null>(null);
+  private refreshToken = new BehaviorSubject<string | null>(null);
+  private user = new BehaviorSubject<any>(null);
 
   constructor(private http: HttpClient) {
-    this.loadTokens();
   }
 
-  private loadTokens() {
-    if (typeof localStorage !== 'undefined') {
-      const storedAccessToken = localStorage.getItem('accessToken');
-      const storedRefreshToken = localStorage.getItem('refreshToken');
-      if (storedAccessToken && storedRefreshToken) {
-        this.accessToken = storedAccessToken;
-        this._refreshToken = storedRefreshToken;
-        this.authenticated.next(true);
-      }
-    }
-  }
 
-  private saveTokens(accessToken: string, refreshToken: string) {
-    this.accessToken = accessToken;
-    this._refreshToken = refreshToken;
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+
+  private saveTokens(accessToken: string, refreshToken: string, user: any) {
+    this.accessToken.next(accessToken);
+    this.refreshToken.next(refreshToken);
+    this.user.next(user);
     this.authenticated.next(true);
   }
 
-  login(credentials: { email: string; password: string }): Observable<{ accessToken: string, refreshToken: string }> {
-    return this.http.post<{ accessToken: string, refreshToken: string }>(`${this.apiUrl}/auth/login`, credentials)
+  login(credentials: { email: string; password: string }): Observable<{ accessToken: string; refreshToken: string; user: any }> {
+    return this.http.post<{ accessToken: string; refreshToken: string; user: any }>(`${this.apiUrl}/auth/login`, credentials)
       .pipe(
         tap(response => {
-          this.saveTokens(response.accessToken, response.refreshToken);
+          this.saveTokens(response.accessToken, response.refreshToken, response.user);
         })
       );
   }
 
   refreshAccessToken(): Observable<{ accessToken: string }> {
-    return this.http.post<{ accessToken: string }>(`${this.apiUrl}/auth/refresh`, { refreshToken: this._refreshToken })
+    const refreshTokenValue = this.refreshToken.getValue();
+    return this.http.post<{ accessToken: string }>(`${this.apiUrl}/auth/refresh`, { refreshToken: refreshTokenValue })
       .pipe(
         tap(response => {
-          this.accessToken = response.accessToken;
-          localStorage.setItem('accessToken', response.accessToken);
+          this.accessToken.next(response.accessToken);
         })
       );
   }
 
   logout(): void {
-    this.accessToken = null;
-    this._refreshToken = null;
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    this.accessToken.next(null);
+    this.refreshToken.next(null);
+    this.user.next(null);
     this.authenticated.next(false);
   }
 
@@ -67,7 +55,15 @@ export class AuthService {
     return this.authenticated.asObservable();
   }
 
-  getAccessToken(): string | null {
-    return this.accessToken;
+  getAccessToken(): Observable<string | null> {
+    return this.accessToken.asObservable();
+  }
+
+  getAccessTokenValue(): string | null {
+    return this.accessToken.getValue();
+  }
+
+  getUser(): Observable<any> {
+    return this.user.asObservable();
   }
 }
