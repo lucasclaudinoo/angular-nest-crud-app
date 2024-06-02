@@ -1,35 +1,73 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private mockUser = {
-    email: 'user@example.com',
-    password: '123456',
-    token: 'mocked-token',
-  };
-  private authenticated = false;
+  private apiUrl = 'http://localhost:3000';
+  private authenticated = new BehaviorSubject<boolean>(false);
+  private accessToken: string | null = null;
+  private _refreshToken: string | null = null;
 
-
-  login(credentials: { email: string; password: string }): Observable<{ token: string, error?: string }> {
-    if (credentials.email === this.mockUser.email && credentials.password === this.mockUser.password) {
-        this.authenticated = true;
-        return of({ token: this.mockUser.token });
-    } else {
-        if (credentials.email !== this.mockUser.email) {
-            return of({ token: '', error: 'Email' });
-        } else {
-            return of({ token: '' });
-        }
-    }
-}
-
-  logout(): void {
+  constructor(private http: HttpClient) {
+    this.loadTokens();
   }
 
-  isAuthenticated(): boolean {
-    return this.authenticated;
+  private loadTokens() {
+    if (typeof localStorage !== 'undefined') {
+      const storedAccessToken = localStorage.getItem('accessToken');
+      const storedRefreshToken = localStorage.getItem('refreshToken');
+      if (storedAccessToken && storedRefreshToken) {
+        this.accessToken = storedAccessToken;
+        this._refreshToken = storedRefreshToken;
+        this.authenticated.next(true);
+      }
+    }
+  }
+
+  private saveTokens(accessToken: string, refreshToken: string) {
+    this.accessToken = accessToken;
+    this._refreshToken = refreshToken;
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    this.authenticated.next(true);
+  }
+
+  login(credentials: { email: string; password: string }): Observable<{ accessToken: string, refreshToken: string }> {
+    return this.http.post<{ accessToken: string, refreshToken: string }>(`${this.apiUrl}/auth/login`, credentials)
+      .pipe(
+        tap(response => {
+          this.saveTokens(response.accessToken, response.refreshToken);
+        })
+      );
+  }
+
+  refreshAccessToken(): Observable<{ accessToken: string }> {
+    return this.http.post<{ accessToken: string }>(`${this.apiUrl}/auth/refresh`, { refreshToken: this._refreshToken })
+      .pipe(
+        tap(response => {
+          this.accessToken = response.accessToken;
+          localStorage.setItem('accessToken', response.accessToken);
+        })
+      );
+  }
+
+  logout(): void {
+    this.accessToken = null;
+    this._refreshToken = null;
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    this.authenticated.next(false);
+  }
+
+  isAuthenticated(): Observable<boolean> {
+    return this.authenticated.asObservable();
+  }
+
+  getAccessToken(): string | null {
+    return this.accessToken;
   }
 }

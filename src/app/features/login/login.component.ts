@@ -30,7 +30,6 @@ import { MatSpinner } from '@angular/material/progress-spinner';
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
-  // Variáveis definidas no início do componente
   loginForm: FormGroup;
   hide = true;
   submitted = false;
@@ -52,20 +51,24 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
-    private changeDetector: ChangeDetectorRef
   ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]]
+      email: [''],
+      password: [''],
     });
 
-    this.loginForm.valueChanges.subscribe(() => {
+    this.loginForm.get('email')?.valueChanges.subscribe(() => {
+      if (this.submitted) {
+        this.validateForm();
+      }
+    });
+
+    this.loginForm.get('password')?.valueChanges.subscribe(() => {
       if (this.submitted) {
         this.validateForm();
       }
     });
   }
-
   ngOnInit(): void {}
 
   get email() {
@@ -76,70 +79,98 @@ export class LoginComponent implements OnInit {
     return this.loginForm.get('password');
   }
 
-  validateForm(): void {
+  validateForm(emailErrorMessage?: string): void {
+
+    
     this.submitted = true;
 
-    const emailControl = this.email;
-    const passwordControl = this.password;
+    const emailControl = this.loginForm.get('email');
+    const passwordControl = this.loginForm.get('password');
+    let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    if (this.invalidCredentials) {
-      this.invalidCrendentialsText = true
-      if (emailControl) {
-        emailControl.setErrors({ 'invalid': true });
-      }
-      if (passwordControl) {
-        passwordControl.setErrors({ 'invalid': true });
-      }
-      this.invalidCredentials = false;
+
+
+
+    if (!this.loginForm.get('email')?.value && !this.loginForm.get('password')?.value) {
+      emailControl?.setErrors({ 'invalid': true });
+      this.emailErrorMessage = this.EMAIL_REQUIRED_MESSAGE;
+      passwordControl?.setErrors({ 'invalid': true });
+      this.passwordErrorMessage = 'Digite uma senha';
+
     }
+
+
+
+
+    if (!emailControl?.value) {
+      this.emailErrorMessage = this.EMAIL_REQUIRED_MESSAGE;
+    }
+
+
 
     if (emailControl) {
-      const isValidEmail = this.EMAIL_REGEX.test(emailControl.value);
+      let isValidEmail = emailRegex.test(emailControl.value);
+  
+      emailControl.setValidators([Validators.required, Validators.email]);
 
-      if (emailControl.invalid && emailControl.errors?.['required']) {
-        this.emailErrorMessage = this.EMAIL_REQUIRED_MESSAGE;
+  
+      if (!emailControl.value) {
+        this.emailErrorMessage = 'Por favor digite seu email cadastrado (email de cadastro)';
       } else if (!isValidEmail) {
-        this.emailErrorMessage = this.EMAIL_INVALID_MESSAGE;
         emailControl.setErrors({ 'invalid': true });
+        console.log('Email inválido');
+        this.emailErrorMessage = 'Digite um email valido';
       } else {
         this.emailErrorMessage = '';
-      }
-    }
-
-    if (passwordControl) {
-      if (passwordControl.invalid && passwordControl.errors?.['required']) {
-        this.passwordErrorMessage = this.PASSWORD_REQUIRED_MESSAGE;
-      } else {
-        this.passwordErrorMessage = '';
+        emailControl.setErrors(null);
       }
     }
 
     this.loginForm.markAllAsTouched();
+
+    if (passwordControl) {
+      if (!passwordControl.value) {
+        passwordControl.setErrors({ 'invalid': true });
+        this.passwordErrorMessage = 'Digite uma senha';
+      } else {
+        passwordControl.clearValidators();
+        this.passwordErrorMessage = '';
+        passwordControl.setErrors(null); 
+      }
+    }
   }
-
   login(): void {
+    this.invalidCrendentialsText = false;
     this.validateForm();
-
+  
     if (this.loginForm.invalid) {
       return;
     }
-
+  
     this.isLoading = true;
-
-    this.authService.login(this.loginForm.value).subscribe(
-      (response: { token: string, error?: string }) => {
-        this.isLoading = true;
-        if (response.token) {
-          this.router.navigate(['/home']);
-        } else {
-          this.invalidCredentials = true;
+    if (this.loginForm.get('email')?.value && this.loginForm.get('password')?.value) {
+      console.log('Login');
+      this.authService.login({
+        email: this.loginForm.get('email')?.value,
+        password: this.loginForm.get('password')?.value
+      }).subscribe(
+        (response: { accessToken: string, refreshToken: string, error?: string }) => {
+          this.isLoading = false;
+          if (response.accessToken) {
+            this.router.navigate(['/home']);
+          } 
+        },
+        (error: any) => {
+          this.invalidCrendentialsText = true;
           this.validateForm();
+          this.isLoading = false;
         }
-      },
-      (error: any) => {
-        this.isLoading = false;
-        console.error('Erro no login', error);
-      }
-    );
+      );
+    } else {
+      this.invalidCrendentialsText = true;
+      this.isLoading = false;
+      this.validateForm();
+    }
   }
+  
 }
