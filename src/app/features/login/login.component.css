@@ -1,27 +1,27 @@
 body, html {
   height: 100%;
   margin: 0;
-  background-color: #f5f5f5; /* Adicione um plano de fundo suave */
+  background-color: #f5f5f5; 
 }
 
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Use 100vh para garantir que o contêiner ocupe toda a altura da viewport */
+  height: 100vh; 
 }
 
 .login-card {
   width: 100%;
-  max-width: 400px; /* Alterado para um valor fixo para melhor controle */
-  padding: 24px; /* Aumentado o espaçamento interno */
-  border-radius: 8px; /* Arredondado as bordas do card */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adicionado sombra mais suave */
-}
+  max-width: 400px; 
+  padding: 24px; 
+  border-radius: 8px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+ }
 
 .login-form-field {
   width: 100%;
-  margin-top: 24px; /* Aumentado o espaçamento entre os campos */
+  margin-top: 24px; 
 }
 
 .login-actions {
@@ -32,12 +32,12 @@ body, html {
 
 mat-card-title {
   font-size: 24px;
-  color: #333; /* Cor do texto do título */
+  color: #333; 
   margin-bottom: 16px;
 }
 
 mat-card {
-  background-color: #fff; /* Cor de fundo do card */
+  background-color: #fff; 
 }
 
 .full-width {
@@ -47,12 +47,12 @@ mat-card {
 .general-error-container {
   position: relative;
   display: flex;
-  align-items: center; /* Centraliza verticalmente */
+  align-items: center; 
 }
 
 .general-error {
   position: absolute;
-  width: 100%;
+  width: max-content;
   top: 0;
   left: 0;
   color: red;

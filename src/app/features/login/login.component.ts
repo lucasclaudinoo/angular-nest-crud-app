@@ -36,25 +36,22 @@ export class LoginComponent implements OnInit {
   invalidCredentials = false;
   emailErrorMessage: string | undefined;
   passwordErrorMessage: string | undefined;
-  invalidCrendentialsText: boolean = false;
-  isLoading: boolean = false;
-
-
+  invalidCredentialsText = false;
+  isLoading = false;
 
   private readonly EMAIL_REQUIRED_MESSAGE = 'Por favor digite seu email cadastrado (email de cadastro)';
-  private readonly EMAIL_INVALID_MESSAGE = 'Digite um email valido';
+  private readonly EMAIL_INVALID_MESSAGE = 'Digite um email válido';
   private readonly PASSWORD_REQUIRED_MESSAGE = 'Digite uma senha';
-
   private readonly EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService,
+    private authService: AuthService
   ) {
     this.loginForm = this.fb.group({
       email: [''],
-      password: [''],
+      password: ['']
     });
 
     this.loginForm.get('email')?.valueChanges.subscribe(() => {
@@ -69,6 +66,7 @@ export class LoginComponent implements OnInit {
       }
     });
   }
+
   ngOnInit(): void {}
 
   get email() {
@@ -79,98 +77,73 @@ export class LoginComponent implements OnInit {
     return this.loginForm.get('password');
   }
 
-  validateForm(emailErrorMessage?: string): void {
-
-    
+  validateForm(): void {
     this.submitted = true;
 
-    const emailControl = this.loginForm.get('email');
-    const passwordControl = this.loginForm.get('password');
-    let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-
-
-
-    if (!this.loginForm.get('email')?.value && !this.loginForm.get('password')?.value) {
-      emailControl?.setErrors({ 'invalid': true });
-      this.emailErrorMessage = this.EMAIL_REQUIRED_MESSAGE;
-      passwordControl?.setErrors({ 'invalid': true });
-      this.passwordErrorMessage = 'Digite uma senha';
-
-    }
-
-
-
-
-    if (!emailControl?.value) {
-      this.emailErrorMessage = this.EMAIL_REQUIRED_MESSAGE;
-    }
-
-
+    const emailControl = this.email;
+    const passwordControl = this.password;
 
     if (emailControl) {
-      let isValidEmail = emailRegex.test(emailControl.value);
-  
-      emailControl.setValidators([Validators.required, Validators.email]);
-
-  
       if (!emailControl.value) {
-        this.emailErrorMessage = 'Por favor digite seu email cadastrado (email de cadastro)';
-      } else if (!isValidEmail) {
-        emailControl.setErrors({ 'invalid': true });
-        console.log('Email inválido');
-        this.emailErrorMessage = 'Digite um email valido';
+        emailControl.setErrors({ required: true });
+        this.emailErrorMessage = this.EMAIL_REQUIRED_MESSAGE;
+      } else if (!this.EMAIL_REGEX.test(emailControl.value)) {
+        emailControl.setErrors({ pattern: true });
+        this.emailErrorMessage = this.EMAIL_INVALID_MESSAGE;
       } else {
-        this.emailErrorMessage = '';
         emailControl.setErrors(null);
+        this.emailErrorMessage = undefined;
       }
     }
-
-    this.loginForm.markAllAsTouched();
 
     if (passwordControl) {
       if (!passwordControl.value) {
-        passwordControl.setErrors({ 'invalid': true });
-        this.passwordErrorMessage = 'Digite uma senha';
+        passwordControl.setErrors({ required: true });
+        this.passwordErrorMessage = this.PASSWORD_REQUIRED_MESSAGE;
       } else {
-        passwordControl.clearValidators();
-        this.passwordErrorMessage = '';
-        passwordControl.setErrors(null); 
+        passwordControl.setErrors(null);
+        this.passwordErrorMessage = undefined;
       }
     }
+
+    if (this.invalidCredentialsText) {
+      if (emailControl) {
+        emailControl.setErrors({ invalidCredentials: true });
+      }
+      if (passwordControl) {
+        passwordControl.setErrors({ invalidCredentials: true });
+      }
+      this.emailErrorMessage = 'Credenciais inválidas';
+      this.passwordErrorMessage = 'Credenciais inválidas';
+    }
+
+    this.loginForm.markAllAsTouched();
   }
+
   login(): void {
-    this.invalidCrendentialsText = false;
+    this.invalidCredentialsText = false;
     this.validateForm();
-  
+
     if (this.loginForm.invalid) {
       return;
     }
-  
+
     this.isLoading = true;
-    if (this.loginForm.get('email')?.value && this.loginForm.get('password')?.value) {
-      console.log('Login');
-      this.authService.login({
-        email: this.loginForm.get('email')?.value,
-        password: this.loginForm.get('password')?.value
-      }).subscribe(
-        (response: { accessToken: string, refreshToken: string, error?: string }) => {
-          this.isLoading = false;
-          if (response.accessToken) {
-            this.router.navigate(['/home']);
-          } 
-        },
-        (error: any) => {
-          this.invalidCrendentialsText = true;
-          this.validateForm();
-          this.isLoading = false;
+    this.authService.login({
+      email: this.email?.value,
+      password: this.password?.value
+    }).subscribe(
+      (response: { accessToken: string; refreshToken: string; error?: string }) => {
+        this.isLoading = false;
+        if (response.accessToken) {
+          this.router.navigate(['/home']);
         }
-      );
-    } else {
-      this.invalidCrendentialsText = true;
-      this.isLoading = false;
-      this.validateForm();
-    }
+      },
+      (error: any) => {
+        this.invalidCredentialsText = true;
+        this.validateForm();
+        this.isLoading = false;
+      }
+    );
   }
-  
 }
