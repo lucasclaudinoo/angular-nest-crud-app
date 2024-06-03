@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
-import { AuthService } from '../services/auth/auth.service';
+import { AuthService } from '../services/auth/auth.service';	
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -32,14 +32,17 @@ export class AuthInterceptor implements HttpInterceptor {
 
   private handle401Error(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return this.authService.refreshAccessToken().pipe(
-      switchMap(() => {
-        const accessToken = this.authService.getAccessTokenValue();
-        const authReq = req.clone({
-          setHeaders: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        return next.handle(authReq);
+      switchMap((response: { accessToken: any; }) => {
+        if (response.accessToken) {
+          const accessToken = this.authService.getAccessTokenValue();
+          const authReq = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+          return next.handle(authReq);
+        }
+        return throwError('Token refresh failed');
       }),
       catchError((error: any) => {
         this.authService.logout();

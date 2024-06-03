@@ -49,6 +49,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private authService: AuthService
   ) {
+    console.log('LoginComponent a');
     this.loginForm = this.fb.group({
       email: [''],
       password: ['']
