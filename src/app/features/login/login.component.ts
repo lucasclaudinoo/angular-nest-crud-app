@@ -43,6 +43,7 @@ export class LoginComponent implements OnInit {
   private readonly EMAIL_INVALID_MESSAGE = 'Digite um email válido';
   private readonly PASSWORD_REQUIRED_MESSAGE = 'Digite uma senha';
   private readonly EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  private readonly  INVALID_CREDENTIALS = 'Credenciais inválidas. Por favor, tente novamente.';
 
   constructor(
     private fb: FormBuilder,
@@ -108,6 +109,7 @@ export class LoginComponent implements OnInit {
     }
 
     if (this.invalidCredentialsText) {
+      this.invalidCredentials = this.INVALID_CREDENTIALS
       if (emailControl) {
         emailControl.setErrors({ invalidCredentials: true });
       }
