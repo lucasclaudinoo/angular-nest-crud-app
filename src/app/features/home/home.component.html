@@ -1,1 +1,79 @@
-<p>home works!</p>
+<div class="container">
+    <div class="header">
+      <h2 class="mat-h2">{{ title }}</h2>
+      <button mat-raised-button color="primary">Nova Entidade</button>
+    </div>
+    <mat-card class="table-card">
+      <mat-card-content>
+        <mat-form-field class="filter-full-width">
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput [formControl]="searchValue" placeholder="Faça a filtragem das informações" />
+          </mat-form-field>
+        <table mat-table [dataSource]="dataSource">
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef class="mat-column-width">
+              Nome
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">
+              {{ element.name }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="region">
+            <mat-header-cell *matHeaderCellDef class="mat-column-width">
+              Região
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">
+              {{ element.region }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="specialties">
+            <mat-header-cell *matHeaderCellDef class="mat-column-width">
+              Especialidades
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">
+              {{ element.specialties }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="active">
+            <mat-header-cell *matHeaderCellDef class="mat-column-width">
+              Ativa
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">
+              {{ element.active }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="mat-column-width">
+              Ações
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">
+              <div class="icon-container">
+                <mat-icon>visibility</mat-icon>
+              </div>
+              <div class="icon-container">
+                <mat-icon>edit</mat-icon>
+              </div>
+            </mat-cell>
+          </ng-container>
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+        </table>
+        <div *ngIf="isEmpty" class="empty-table-message">
+          Sem entidade cadastrada
+        </div>
+        <div class="paginator-container">
+          <div class="items-per-page">
+            Itens mostrados na página: {{ pageSize }}
+          </div>
+          <div class="paginator-wrapper">
+            <mat-paginator
+              [hidePageSize]="true"
+              showFirstLastButtons
+              class="paginator"
+            ></mat-paginator>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  

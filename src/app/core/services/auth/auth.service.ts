@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { tap, catchError, switchMap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
+
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/auth';
+  private apiUrl = environment.apiUrl;
   private authenticated = new BehaviorSubject<boolean>(false);
   private accessToken = new BehaviorSubject<string | null>(null);
   private user = new BehaviorSubject<any>(null);
