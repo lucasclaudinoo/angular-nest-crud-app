@@ -1,4 +1,4 @@
-<div class="login-container" [formGroup]="loginForm" [ngClass]="{'form-submitted': submitted}">
+<div class="login-container" [formGroup]="authForm" [ngClass]="{'form-submitted': submitted}">
   <mat-card class="login-card">
     <mat-card-content>
       <mat-grid-list cols="1" rowHeight="200px">
@@ -11,14 +11,14 @@
         <mat-form-field class="login-form-field">
           <mat-label>Email</mat-label>
           <input matInput type="email" placeholder="Ex. pat@example.com" formControlName="email">
-          <mat-error *ngIf="(submitted && loginForm.get('email')?.invalid) || emailErrorMessage">
+          <mat-error *ngIf="(submitted && authForm.get('email')?.invalid) || emailErrorMessage">
             {{ emailErrorMessage }}
           </mat-error>
         </mat-form-field>
         <mat-form-field class="login-form-field">
           <mat-label>Senha</mat-label>
           <input matInput [type]="hide ? 'password' : 'text'" formControlName="password">
-          <mat-error *ngIf="submitted && loginForm.get('password')?.invalid">
+          <mat-error *ngIf="submitted && authForm.get('password')?.invalid">
             {{ passwordErrorMessage }}
           </mat-error>
           <button mat-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
@@ -28,7 +28,7 @@
       </mat-grid-list>
     </mat-card-content>
     <mat-card-actions class="login-actions">
-      <button mat-raised-button color="primary" class="full-width" (click)="login()" [disabled]="isLoading">
+      <button mat-raised-button color="primary" class="full-width" (click)="auth()" [disabled]="isLoading">
         <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
         <span *ngIf="!isLoading">Login</span>
       </button>

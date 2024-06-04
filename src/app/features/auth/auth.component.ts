@@ -25,12 +25,12 @@ import { MatSpinner } from '@angular/material/progress-spinner';
     CommonModule,
     MatSpinner
   ],
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  selector: 'app-auth',
+  templateUrl: './auth.component.html',
+  styleUrl: './auth.component.css'
 })
-export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
+export class AuthComponent implements OnInit {
+  authForm: FormGroup;
   hide = true;
   submitted = false;
   invalidCredentials = false;
@@ -50,19 +50,18 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private authService: AuthService
   ) {
-    console.log('LoginComponent a');
-    this.loginForm = this.fb.group({
+    this.authForm = this.fb.group({
       email: [''],
       password: ['']
     });
 
-    this.loginForm.get('email')?.valueChanges.subscribe(() => {
+    this.authForm.get('email')?.valueChanges.subscribe(() => {
       if (this.submitted) {
         this.validateForm();
       }
     });
 
-    this.loginForm.get('password')?.valueChanges.subscribe(() => {
+    this.authForm.get('password')?.valueChanges.subscribe(() => {
       if (this.submitted) {
         this.validateForm();
       }
@@ -72,11 +71,11 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {}
 
   get email() {
-    return this.loginForm.get('email');
+    return this.authForm.get('email');
   }
 
   get password() {
-    return this.loginForm.get('password');
+    return this.authForm.get('password');
   }
 
   validateForm(): void {
@@ -109,7 +108,7 @@ export class LoginComponent implements OnInit {
     }
 
     if (this.invalidCredentialsText) {
-      this.invalidCredentials = this.INVALID_CREDENTIALS
+      // this.invalidCredentials = this.INVALID_CREDENTIALS
       if (emailControl) {
         emailControl.setErrors({ invalidCredentials: true });
       }
@@ -120,15 +119,15 @@ export class LoginComponent implements OnInit {
       this.passwordErrorMessage = 'Credenciais inválidas';
     }
 
-    this.loginForm.markAllAsTouched();
+    this.authForm.markAllAsTouched();
   }
 
-  login(): void {
+  auth(): void {
     this.invalidCredentialsText = false;
     this.validateForm();
 
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
+    if (this.authForm.invalid) {
+      this.authForm.markAllAsTouched();
       return;
     }
 
