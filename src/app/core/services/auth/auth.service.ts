@@ -24,19 +24,34 @@ export class AuthService {
     // Poderia adicionar lógica para verificar um possível token armazenado se necessário
   }
 
-  private saveTokens(accessToken: string, user: any) {
-    this.accessToken.next(accessToken);
-    this.user.next(user);
-    this.authenticated.next(true);
-  }
-  login(credentials: { email: string; password: string }): Observable<{ accessToken: string; user: any }> {
-    return this.http.post<{ accessToken: string; user: any }>(`${this.apiUrl}/login`, credentials, { withCredentials: true })
+
+
+
+  login(credentials: { email: string; password: string }): Observable<{ accessToken: string; userId: number }> {
+    return this.http.post<{ accessToken: string; userId: number }>(`${this.apiUrl}/login`, credentials, { withCredentials: true })
       .pipe(
         tap(response => {
-          this.saveTokens(response.accessToken, response.user);
+          console.log('Resposta da API de login:', response); // Log da resposta da API
+          this.saveTokens(response.accessToken, response.userId); // Passa tanto o accessToken quanto o userId para saveTokens
+        }),
+        catchError(error => {
+          console.error('Erro na chamada da API de login:', error); // Log detalhado do erro
+          throw new Error('Authentication failed'); // Lança um erro para ser capturado pelo código que chama o login
         })
       );
   }
+
+  private saveTokens(accessToken: string, userId: number): void {
+    if (!accessToken || !userId) {
+      console.error('Tokens inválidos:', { accessToken, userId });
+      throw new Error('Invalid tokens');
+    }
+    this.authenticated.next(true);
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('userId', userId.toString());
+  }
+  
+  
   refreshAccessToken(): Observable<{ accessToken: string | null; }> {
     return this.http.post<{ accessToken: string }>(`${this.apiUrl}/refresh`, {}, { withCredentials: true })
       .pipe(

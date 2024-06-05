@@ -1,41 +1,47 @@
-<!-- src/app/home/home.component.html -->
 <div class="container mt-4">
   <div class="header d-flex justify-content-center align-items-center flex-wrap">
     <h2 class="mat-h2 text-center">{{ title }}</h2>
-    <button mat-raised-button color="primary">Nova Entidade</button>
+    <button mat-raised-button color="primary" (click)="openModal()">Nova Entidade</button>
   </div>
   <mat-card class="table-card">
     <mat-card-content>
       <mat-form-field class="filter-full-width">
         <mat-icon matPrefix>search</mat-icon>
         <input matInput [formControl]="searchValue" placeholder="Faça a filtragem das informações" />
+        <button *ngIf="searchValue.value" matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()">
+          <mat-icon>clear</mat-icon>
+        </button>
       </mat-form-field>
+      
       <div class="table-responsive">
         <table mat-table [dataSource]="dataSource" class="table">
-          <ng-container matColumnDef="name">
+          <ng-container matColumnDef="nomeFantasia">
             <mat-header-cell *matHeaderCellDef class="mat-column-width">Nome</mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.name }}</mat-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.nomeFantasia }}</mat-cell>
           </ng-container>
-          <ng-container matColumnDef="region">
+          <ng-container matColumnDef="regional">
             <mat-header-cell *matHeaderCellDef class="mat-column-width">Região</mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.region }}</mat-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.regional }}</mat-cell>
           </ng-container>
-          <ng-container matColumnDef="specialties">
+          <ng-container matColumnDef="especialidadesMedicas">
             <mat-header-cell *matHeaderCellDef class="mat-column-width">Especialidades</mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.specialties }}</mat-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.especialidadesMedicas }}</mat-cell>
           </ng-container>
-          <ng-container matColumnDef="active">
+          <ng-container matColumnDef="ativa">
             <mat-header-cell *matHeaderCellDef class="mat-column-width">Ativa</mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.active ? 'Ativo' : 'Inativo' }}</mat-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.ativa ? 'Ativo' : 'Inativo' }}</mat-cell>
           </ng-container>
           <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef class="mat-column-width">Ações</mat-header-cell>
             <mat-cell *matCellDef="let element" class="mat-column-width">
-              <div class="icon-container d-flex">
+              <div class="icon-container d-flex" (click)="openModal(element)">
                 <mat-icon>edit</mat-icon>
               </div>
               <div class="icon-container d-flex">
                 <mat-icon class="mr-2">visibility</mat-icon>
+              </div>
+              <div class="icon-container d-flex">
+                <mat-icon (click)="deleteEntity(element.id)">delete</mat-icon>
               </div>
             </mat-cell>
           </ng-container>

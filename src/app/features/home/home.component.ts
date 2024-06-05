@@ -8,10 +8,14 @@ import { MatInput, MatInputModule } from '@angular/material/input';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource } from '@angular/material/table';
 import { EntityModel, ResponseModel } from '../../core/models/entity.model';
+import { MatDialog } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { EntitiesService } from '../../core/services/entities/entities.service';
+import { CreateComponent } from './create-modal/modal-component.component';
+import { SharedModalComponent } from '../../shared/shared-modal/shared-modal.component';
 
 @Component({
   selector: 'app-home',
@@ -26,18 +30,18 @@ import { EntitiesService } from '../../core/services/entities/entities.service';
     MatButton,
     MatButtonModule,
     CommonModule,
-    ReactiveFormsModule
-  ],
+    ReactiveFormsModule,
+   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
   title = 'Entity';
   displayedColumns: string[] = [
-    'name',
-    'region',
-    'specialties',
-    'active',
+    'nomeFantasia',
+    'regional',
+    'especialidadesMedicas',
+    'ativa',
     'actions',
   ];
   dataSource: MatTableDataSource<EntityModel> = new MatTableDataSource<EntityModel>();
@@ -47,8 +51,12 @@ export class HomeComponent implements OnInit {
   isEmpty: boolean = true;
   queryString: string = '';
   searchValue: FormControl = new FormControl();
+  
 
-  constructor(private entitiesService: EntitiesService) {}
+  constructor(
+    private entitiesService: EntitiesService,
+    private dialog: MatDialog 
+    ) {}
 
   ngOnInit(): void {
     this.searchValue.valueChanges
@@ -56,6 +64,10 @@ export class HomeComponent implements OnInit {
       .subscribe(value => this.searchEntities(value));
 
     this.getEntitiesFromServer();
+  }
+
+  clearSearch() {
+    this.searchValue.setValue('');
   }
 
   getEntitiesFromServer() {
@@ -142,5 +154,34 @@ export class HomeComponent implements OnInit {
   onLastPageClick() {
     this.currentPage = Math.ceil(this.length / this.pageSize) - 1;
     this.getEntitiesFromServer();
+  }
+
+  openModal(entity?: EntityModel): void {
+    const dialogRef = this.dialog.open(CreateComponent, {
+      width: '40%',
+      minWidth: '300px', // Defina o tamanho mínimo desejado aqui
+      data: entity || {}
+    });
+  
+    dialogRef.afterClosed().subscribe(() => {
+      this.getEntitiesFromServer();
+    });
+  }
+  
+  
+
+  deleteEntity(id: string): void {
+    const dialogRef = this.dialog.open(SharedModalComponent, {
+      width: '250px',
+      data: { message: 'Tem certeza que deseja deletar esta entidade?' }
+    });
+
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result === true) {
+        this.entitiesService.deleteEntity(id).subscribe(() => {
+          this.getEntitiesFromServer();
+        });
+      }
+    });
   }
 }
