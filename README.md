@@ -1,27 +1,28 @@
 # Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.8.
+Este projeto é um frontend gerado com Angular CLI na versão 17.3.8.
 
-## Development server
+## Dockerização e Execução
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Para rodar a aplicação usando Docker, você pode usar Docker Compose. Certifique-se de ter o Docker e o Docker Compose instalados em seu sistema.
 
-## Code scaffolding
+1. Certifique-se de estar na raiz do projeto.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+2. Construa a imagem do Docker executando o seguinte comando:
+   
+docker-compose build
 
-## Build
+3. Após a construção bem-sucedida da imagem, inicie a aplicação executando o seguinte comando:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+docker-compose up
 
-## Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Isso irá iniciar a aplicação e você poderá acessá-la em `http://localhost:4200/`.
 
-## Running end-to-end tests
+O aplicativo será automaticamente recarregado se você fizer qualquer alteração nos arquivos de origem.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Para mais informações sobre o Docker e o Docker Compose, consulte a documentação oficial:
 
-## Further help
+- [Docker Documentation](https://docs.docker.com/)
+- [Docker Compose Documentation](https://docs.docker.com/compose/)
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
