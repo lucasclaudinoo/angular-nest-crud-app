@@ -10,7 +10,7 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl;
+  private apiUrl = `${environment.apiUrl}/auth`;
   private authenticated = new BehaviorSubject<boolean>(false);
   private accessToken = new BehaviorSubject<string | null>(null);
   private user = new BehaviorSubject<any>(null);

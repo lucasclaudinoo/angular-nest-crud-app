@@ -1,79 +1,73 @@
-<div class="container">
-    <div class="header">
-      <h2 class="mat-h2">{{ title }}</h2>
-      <button mat-raised-button color="primary">Nova Entidade</button>
-    </div>
-    <mat-card class="table-card">
-      <mat-card-content>
-        <mat-form-field class="filter-full-width">
-            <mat-icon matPrefix>search</mat-icon>
-            <input matInput [formControl]="searchValue" placeholder="Faça a filtragem das informações" />
-          </mat-form-field>
-        <table mat-table [dataSource]="dataSource">
+<!-- src/app/home/home.component.html -->
+<div class="container mt-4">
+  <div class="header d-flex justify-content-center align-items-center flex-wrap">
+    <h2 class="mat-h2 text-center">{{ title }}</h2>
+    <button mat-raised-button color="primary">Nova Entidade</button>
+  </div>
+  <mat-card class="table-card">
+    <mat-card-content>
+      <mat-form-field class="filter-full-width">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [formControl]="searchValue" placeholder="Faça a filtragem das informações" />
+      </mat-form-field>
+      <div class="table-responsive">
+        <table mat-table [dataSource]="dataSource" class="table">
           <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef class="mat-column-width">
-              Nome
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-width">
-              {{ element.name }}
-            </mat-cell>
+            <mat-header-cell *matHeaderCellDef class="mat-column-width">Nome</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.name }}</mat-cell>
           </ng-container>
           <ng-container matColumnDef="region">
-            <mat-header-cell *matHeaderCellDef class="mat-column-width">
-              Região
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-width">
-              {{ element.region }}
-            </mat-cell>
+            <mat-header-cell *matHeaderCellDef class="mat-column-width">Região</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.region }}</mat-cell>
           </ng-container>
           <ng-container matColumnDef="specialties">
-            <mat-header-cell *matHeaderCellDef class="mat-column-width">
-              Especialidades
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-width">
-              {{ element.specialties }}
-            </mat-cell>
+            <mat-header-cell *matHeaderCellDef class="mat-column-width">Especialidades</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.specialties }}</mat-cell>
           </ng-container>
           <ng-container matColumnDef="active">
-            <mat-header-cell *matHeaderCellDef class="mat-column-width">
-              Ativa
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-width">
-              {{ element.active }}
-            </mat-cell>
+            <mat-header-cell *matHeaderCellDef class="mat-column-width">Ativa</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-width">{{ element.active ? 'Ativo' : 'Inativo' }}</mat-cell>
           </ng-container>
           <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef class="mat-column-width">
-              Ações
-            </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef class="mat-column-width">Ações</mat-header-cell>
             <mat-cell *matCellDef="let element" class="mat-column-width">
-              <div class="icon-container">
-                <mat-icon>visibility</mat-icon>
-              </div>
-              <div class="icon-container">
+              <div class="icon-container d-flex">
                 <mat-icon>edit</mat-icon>
+              </div>
+              <div class="icon-container d-flex">
+                <mat-icon class="mr-2">visibility</mat-icon>
               </div>
             </mat-cell>
           </ng-container>
           <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
           <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
         </table>
-        <div *ngIf="isEmpty" class="empty-table-message">
-          Sem entidade cadastrada
+      </div>
+      <div *ngIf="isEmpty" class="empty-table-message">Sem entidade cadastrada</div>
+      <div class="paginator-container d-flex justify-content-between align-items-center mt-3 flex-wrap">
+        <div class="pagination">
+          <span style="align-self: center; margin-right: auto; margin-left: 1%">
+            Mostrando {{ length > 0 ? currentPage * pageSize + 1 : 0 }} a
+            {{ length > 0 ? (currentPage + 1) * pageSize > length ? length : (currentPage + 1) * pageSize : 0 }}
+            de {{ length }}
+          </span>
+          <button class="btn btn-sm" style="padding: 10px; border: none; background: none;" [disabled]="currentPage === 0" (click)="onFirstPageClick()">
+            <mat-icon>first_page</mat-icon>
+          </button>
+          <button class="btn btn-sm" style="padding: 10px; border: none; background: none; " [disabled]="currentPage <= 0" (click)="onPreviousPageClick()">
+            <mat-icon>keyboard_arrow_left</mat-icon>
+          </button>
+          <span class="page-number">
+            <span>{{ currentPage + 1 }}</span>
+          </span>
+          <button class="btn btn-sm" style="padding: 10px; border: none; background: none;" [disabled]="currentPage + 1 >= length / pageSize" (click)="onNextPageClick()">
+            <mat-icon>keyboard_arrow_right</mat-icon>
+          </button>
+          <button class="btn btn-sm" style="padding: 10px; border: none; background: none;" [disabled]="currentPage + 1 >= length / pageSize" (click)="onLastPageClick()">
+            <mat-icon>last_page</mat-icon>
+          </button>
         </div>
-        <div class="paginator-container">
-          <div class="items-per-page">
-            Itens mostrados na página: {{ pageSize }}
-          </div>
-          <div class="paginator-wrapper">
-            <mat-paginator
-              [hidePageSize]="true"
-              showFirstLastButtons
-              class="paginator"
-            ></mat-paginator>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-  
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

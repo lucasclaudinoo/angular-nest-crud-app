@@ -1,17 +1,17 @@
+// src/app/home/home.component.ts
 import { Component, OnInit } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatInput, MatInputModule } from '@angular/material/input';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource } from '@angular/material/table';
-import { Subscription } from 'rxjs';
 import { EntityModel, ResponseModel } from '../../core/models/entity.model';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { EntitiesService } from '../../core/services/entities/entities.service';
 
 @Component({
   selector: 'app-home',
@@ -21,8 +21,6 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
     MatCardModule,
     MatTableModule,
     MatFormFieldModule,
-    MatPaginator,
-    MatTable,
     MatInputModule,
     MatInput,
     MatButton,
@@ -31,7 +29,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
     ReactiveFormsModule
   ],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css',
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
   title = 'Entity';
@@ -42,85 +40,107 @@ export class HomeComponent implements OnInit {
     'active',
     'actions',
   ];
-  dataSource: MatTableDataSource<any> = new MatTableDataSource<any>();
-  loadDataSubscription: Subscription = new Subscription();
+  dataSource: MatTableDataSource<EntityModel> = new MatTableDataSource<EntityModel>();
   currentPage: number = 0;
   length: number = 0;
-  pageSize: number = 10;
+  pageSize: number = 5;
   isEmpty: boolean = true;
   queryString: string = '';
   searchValue: FormControl = new FormControl();
 
-  // ELEMENT_DATA: any[] = [
-  //   { name: 'Entity 1', region: 'Region 1', specialties: 'Specialty 1', active: 'Active' },
-  //   { name: 'Entity 2', region: 'Region 2', specialties: 'Specialty 2', active: 'Active' },
-  //   { name: 'Entity 3', region: 'Region 3', specialties: 'Specialty 3', active: 'Active' },
-  //   { name: 'Entity 4', region: 'Region 4', specialties: 'Specialty 4', active: 'Active' },
-  //   { name: 'Entity 5', region: 'Region 5', specialties: 'Specialty 5', active: 'Active' },
-  // ];
-
-  constructor() {}
+  constructor(private entitiesService: EntitiesService) {}
 
   ngOnInit(): void {
     this.searchValue.valueChanges
-    .pipe((debounceTime(500)),
-    distinctUntilChanged())
-    .subscribe(value => this.searchEntities(value));
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe(value => this.searchEntities(value));
 
-    // this.getEntitiesFromServer();
+    this.getEntitiesFromServer();
+  }
+
+  getEntitiesFromServer() {
+    this.entitiesService.getEntities(this.queryString, this.currentPage, this.pageSize).subscribe(
+      (response: ResponseModel) => {
+        this.length = response.totalReports;
+        if (response.totalReports > 0) {
+          this.setEntities(response.result);
+        } else {
+          this.currentPage = 0;
+          this.setEntities([]);
+          this.isEmpty = true;
+        }
+      },
+      (error: any) => {
+        console.error('Error:', error);
+        this.setEntities([]);
+      }
+    );
   }
   
-  // getEntitiesFromServer() {
-  //   if (this.loadDataSubscription) {
-  //     this.loadDataSubscription.unsubscribe();
-  //   }
+
   
-  //   this.loadDataSubscription = this.yourService
-  //     .getEntities(this.currentPage, this.queryString)
-  //     .subscribe(
-  //       (responseModel: ResponseModel) => {
-  //         this.length = responseModel.totalReports;
-  //         if (responseModel.totalReports > 0) {
-  //           this.setEntities(responseModel.result);
-  //         } else {
-  //           this.currentPage = 0;
-  //           this.setEntities([]);
-  //           this.isEmpty = true;
-  //         }
-  //       },
-  //       (error) => {
-  //         console.error('Error:', error);
-  //         this.setEntities([]);
-  //       }
-  //     );
-  // }
-  
+
   setEntities(entities: EntityModel[]) {
     this.dataSource = new MatTableDataSource<EntityModel>(entities);
-    if (entities.length > 0) {
-      this.isEmpty = false;
-    }
+    this.isEmpty = entities.length === 0;
   }
-  
+
   searchEntities(value: string): void {
-    console.log(value)
-    if (value.length > 2) {
-      this.filterEntities();
-    }
+    this.filterEntities();
     if (value === '') {
       let params = new URLSearchParams(this.queryString);
       params.delete('search');
       this.queryString = '?' + params.toString();
-      // this.getEntitiesFromServer();
+      this.getEntitiesFromServer();
+    } else {
+      value = value.toLowerCase();
+      if (value === 'ativo') {
+        value = 'true';
+      } else if (value === 'inativo') {
+        value = 'false';
+      }
+      this.queryString = `search=${value}`;
+      this.getEntitiesFromServer();
     }
   }
-  
+
   filterEntities() {
     this.generateQueryString();
-    // this.getEntitiesFromServer();
   }
-  
+
   generateQueryString() {
-    // gera a query string aqui
+    this.queryString = `search=${this.searchValue.value}`;
+    this.getEntitiesFromServer();
+    console.log('Query string:', this.queryString);
+  }
+
+  onPageChange(event: any) {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.getEntitiesFromServer();
+  }
+
+  onPreviousPageClick() {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.getEntitiesFromServer();
+    }
+  }
+
+  onNextPageClick() {
+    if (this.currentPage < Math.ceil(this.length / this.pageSize) - 1) {
+      this.currentPage++;
+      this.getEntitiesFromServer();
+    }
+  }
+
+  onFirstPageClick() {
+    this.currentPage = 0;
+    this.getEntitiesFromServer();
+  }
+
+  onLastPageClick() {
+    this.currentPage = Math.ceil(this.length / this.pageSize) - 1;
+    this.getEntitiesFromServer();
   }
 }
