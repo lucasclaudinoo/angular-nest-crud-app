@@ -4,19 +4,19 @@
     <div class="form-columns">
       <div class="form-column">
         <mat-form-field class="full-width">
-          <input matInput placeholder="Nome Fantasia" formControlName="nomeFantasia" required />
+          <input matInput placeholder="Nome Fantasia" formControlName="nomeFantasia" required  [disabled]="data.isViewMode"/>
           <mat-error *ngIf="formGroup.get('nomeFantasia')?.invalid">{{ getErrorMessage('nomeFantasia') }}</mat-error>
         </mat-form-field>
       </div>
       <div class="form-column">
         <mat-form-field class="full-width">
-          <input matInput placeholder="Razão Social" formControlName="razaoSocial" required />
+          <input matInput placeholder="Razão Social" formControlName="razaoSocial" required [disabled]="data.isViewMode"/>
           <mat-error *ngIf="formGroup.get('razaoSocial')?.invalid">{{ getErrorMessage('razaoSocial') }}</mat-error>
         </mat-form-field>
       </div>
       <div class="form-column">
         <mat-form-field class="full-width">
-          <mat-select placeholder="Regional" formControlName="regional" required>
+          <mat-select placeholder="Regional" formControlName="regional" required [disabled]="data.isViewMode">
             <mat-option *ngFor="let regional of regionais" [value]="regional.value">{{regional.label}}</mat-option>
           </mat-select>
           <mat-error *ngIf="formGroup.get('regional')?.invalid">{{ getErrorMessage('regional') }}</mat-error>
@@ -24,13 +24,13 @@
       </div>
       <div class="form-column-full">
         <mat-form-field class="full-width">
-          <input matInput placeholder="CNPJ" formControlName="cnpj" appCnpjMask required />
+          <input matInput placeholder="CNPJ" formControlName="cnpj" appCnpjMask required [disabled]="data.isViewMode" />
           <mat-error *ngIf="formGroup.get('cnpj')?.invalid">{{ getErrorMessage('cnpj') }}</mat-error>
         </mat-form-field>
       </div>
       <div class="form-column-full">
         <mat-form-field class="full-width">
-          <mat-select placeholder="Especialidades Médicas" formControlName="especialidadesMedicas" multiple required>
+          <mat-select placeholder="Especialidades Médicas" formControlName="especialidadesMedicas" multiple required [disabled]="data.isViewMode">
             <mat-option *ngFor="let especialidade of especialidadesMedicasList" [value]="especialidade">{{especialidade}}</mat-option>
           </mat-select>
           <mat-error *ngIf="formGroup.get('especialidadesMedicas')?.invalid">{{ getErrorMessage('especialidadesMedicas') }}</mat-error>
@@ -38,14 +38,14 @@
       </div>
       <div class="form-column">
         <mat-form-field class="full-width">
-          <input matInput placeholder="Data de Início" formControlName="dataInauguracao" [matDatepicker]="picker" required />
+          <input matInput placeholder="Data de Início" formControlName="dataInauguracao" [matDatepicker]="picker" required [disabled]="data.isViewMode" />
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
           <mat-error *ngIf="formGroup.get('dataInauguracao')?.invalid">{{ getErrorMessage('dataInauguracao') }}</mat-error>
         </mat-form-field>
       </div>
       <div class="form-column">
-        <mat-checkbox formControlName="ativa">Ativo</mat-checkbox>
+        <mat-checkbox formControlName="ativa" [disabled]="data.isViewMode">Ativo</mat-checkbox>
       </div> 
     </div>
   </mat-dialog-content>
@@ -55,8 +55,8 @@
       class="mat-raised-button"
       color="primary"
       (click)="onSubmit()"
-      [disabled]="formGroup.invalid"
-      [class.disabled-button]="formGroup.invalid"
+      [disabled]="formGroup.invalid || data.isViewMode"
+      [class.disabled-button]="formGroup.invalid || data.isViewMode"
     >Salvar</button>
   </mat-dialog-actions>
 </form>

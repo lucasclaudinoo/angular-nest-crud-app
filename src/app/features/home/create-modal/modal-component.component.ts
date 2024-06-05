@@ -28,6 +28,7 @@ export interface DialogData {
   dataInauguracao: Date;
   ativa: boolean;
   especialidadesMedicas: string[];
+  isViewMode: boolean;
 }
 
 
@@ -85,21 +86,22 @@ export class CreateComponent {
     searchValue = new FormControl('');
 
 
-  constructor(
-    public dialogRef: MatDialogRef<CreateComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private entitiesService: EntitiesService,
-    private snackBar: MatSnackBar
-  ) {
-    this.formGroup = new FormGroup({
-      razaoSocial: new FormControl(data?.razaoSocial || '', [Validators.required]),
-      nomeFantasia: new FormControl(data?.nomeFantasia || '', [Validators.required]),
-      cnpj: new FormControl(data?.cnpj || '', [Validators.required]),
-      regional: new FormControl(data?.regional || '', [Validators.required]),
-      dataInauguracao: new FormControl(data?.dataInauguracao || '', [Validators.required]),
-      ativa: new FormControl(data?.ativa || false),
-      especialidadesMedicas: new FormControl(data?.especialidadesMedicas || [], [Validators.required, minSelectedSpecialties(5)]),
-    });
+    constructor(
+      public dialogRef: MatDialogRef<CreateComponent>,
+      @Inject(MAT_DIALOG_DATA) public data: DialogData,
+      private entitiesService: EntitiesService,
+      private snackBar: MatSnackBar
+    ) {
+      this.formGroup = new FormGroup({
+        razaoSocial: new FormControl({ value: data?.razaoSocial || '', disabled: data?.isViewMode }, [Validators.required]),
+        nomeFantasia: new FormControl({ value: data?.nomeFantasia || '', disabled: data?.isViewMode }, [Validators.required]),
+        cnpj: new FormControl({ value: data?.cnpj || '', disabled: data?.isViewMode }, [Validators.required]),
+        regional: new FormControl({ value: data?.regional || '', disabled: data?.isViewMode }, [Validators.required]),
+        dataInauguracao: new FormControl({ value: data?.dataInauguracao || '', disabled: data?.isViewMode }, [Validators.required]),
+        ativa: new FormControl({ value: data?.ativa || false, disabled: data?.isViewMode }),
+        especialidadesMedicas: new FormControl({ value: data?.especialidadesMedicas || [], disabled: data?.isViewMode }, [Validators.required, minSelectedSpecialties(5)]),
+      });
+    
 
     function minSelectedSpecialties(min: number): ValidatorFn {
       return (control: AbstractControl): ValidationErrors | null => {

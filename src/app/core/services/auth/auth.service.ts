@@ -16,13 +16,8 @@ export class AuthService {
   private user = new BehaviorSubject<any>(null);
 
   constructor(private http: HttpClient) {
-    this.initializeAuthState();
   }
 
-  private initializeAuthState(): void {
-    // Assumindo que o accessToken ainda não está armazenado em lugar algum
-    // Poderia adicionar lógica para verificar um possível token armazenado se necessário
-  }
 
 
 

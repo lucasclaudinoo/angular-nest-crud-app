@@ -156,16 +156,21 @@ export class HomeComponent implements OnInit {
     this.getEntitiesFromServer();
   }
 
-  openModal(entity?: EntityModel): void {
+  openModal(entity?: EntityModel, isViewMode: boolean = false): void {
     const dialogRef = this.dialog.open(CreateComponent, {
       width: '40%',
-      minWidth: '300px', // Defina o tamanho mínimo desejado aqui
-      data: entity || {}
+      minWidth: '300px',
+      data: { ...entity, isViewMode } || {}
     });
   
     dialogRef.afterClosed().subscribe(() => {
       this.getEntitiesFromServer();
     });
+  }
+  
+  
+  viewEntity(entity: EntityModel): void {
+    this.openModal(entity, true);
   }
   
   
